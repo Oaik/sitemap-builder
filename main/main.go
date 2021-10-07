@@ -30,7 +30,7 @@ func bfs(startStr string, maxDepth int) []string {
 		for _, link := range links {
 			currentLinks := get(link)
 			for _, currentLink := range currentLinks {
-				if ok, _ := mp[currentLink]; !ok {
+				if _, ok := mp[currentLink]; !ok {
 					nwLink = append(nwLink, currentLink)
 					mp[currentLink] = true
 				}
