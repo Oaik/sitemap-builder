@@ -1,20 +1,49 @@
 package main
 
 import (
+	"encoding/xml"
 	"flag"
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"sitemap"
 	"strings"
 )
+
+const xmlns = "http://www.sitemaps.org/schemas/sitemap/0.9"
+
+type loc struct {
+	Value string `xml:"loc"`
+}
+
+type urlset struct {
+	Urls  []loc  `xml:"url"`
+	Xmlns string `xml:"xmlns,attr"`
+}
 
 func main() {
 	urlFlag := flag.String("url", "https://gophercises.com/", "the url that you want to build a sitemap for")
 	maxDepth := flag.Int("depth", 3, "maximum number of links deep to traverse")
 	flag.Parse()
-	links := bfs(*urlFlag, *maxDepth)
-	fmt.Println(links)
+	pages := bfs(*urlFlag, *maxDepth)
+	convertToXml(pages)
+}
+
+func convertToXml(pages []string) {
+	toXml := urlset{
+		Urls:  make([]loc, len(pages)),
+		Xmlns: xmlns,
+	}
+	for idx, page := range pages {
+		toXml.Urls[idx] = loc{page}
+	}
+	fmt.Print(xml.Header)
+	enc := xml.NewEncoder(os.Stdout)
+	enc.Indent("", "  ")
+	if err := enc.Encode(toXml); err != nil {
+		panic(err)
+	}
 }
 
 func bfs(startStr string, maxDepth int) []string {
@@ -37,6 +66,9 @@ func bfs(startStr string, maxDepth int) []string {
 			}
 		}
 		links = nwLink
+		if len(links) == 0 {
+			break
+		}
 		allLinks = append(allLinks, links...)
 	}
 	return allLinks
