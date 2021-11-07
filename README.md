@@ -14,7 +14,7 @@
 
 ## About the project
 
-Extend all the anchor tags using DFS and BFS algorithm and create sitemap in XML with given depth 
+crawl a certain page and Using Bfs and Dfs algorithms will create a tree of anchor tags that represent the sitemap of the website
 
 ## Built with
 <ul>
